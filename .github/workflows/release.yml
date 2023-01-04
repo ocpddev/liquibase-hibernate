@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+          cache: 'maven'
+
+      - name: Delete old version package
+        uses: actions/delete-package-versions@v3
+        with:
+          owner: 'phyworks'
+          repo: 'liquibase-hibernate'
+          package-name: 'phyworks.liquibase.ext.liquibase-hibernate5'
+          min-versions-to-keep: 3
+
+      - name: Build
+        run: |
+          mvn versions:set -DnewVersion=4.6.2-b${{ github.run_number }}
+          mvn clean deploy -DskipTests=true
+        env:
+          GITHUB_ACTOR: ${{ secrets.USERNAME }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
