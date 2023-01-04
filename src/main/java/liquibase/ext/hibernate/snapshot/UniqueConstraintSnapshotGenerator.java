@@ -10,12 +10,14 @@ import liquibase.structure.core.Index;
 import liquibase.structure.core.Table;
 import liquibase.structure.core.UniqueConstraint;
 import org.hibernate.HibernateException;
+import org.hibernate.mapping.Constraint;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 
+@SuppressWarnings("all") // third-party code
 public class UniqueConstraintSnapshotGenerator extends HibernateSnapshotGenerator {
 
     public UniqueConstraintSnapshotGenerator() {
@@ -58,7 +60,7 @@ public class UniqueConstraintSnapshotGenerator extends HibernateSnapshotGenerato
                 Index index = getBackingIndex(uniqueConstraint, hibernateTable, snapshot);
                 uniqueConstraint.setBackingIndex(index);
 
-                Scope.getCurrentScope().getLog(getClass()).info("Found unique constraint " + uniqueConstraint.toString());
+                Scope.getCurrentScope().getLog(getClass()).info("Found unique constraint " + uniqueConstraint);
                 table.getUniqueConstraints().add(uniqueConstraint);
             }
             Iterator columnIterator = hibernateTable.getColumnIterator();
@@ -68,12 +70,9 @@ public class UniqueConstraintSnapshotGenerator extends HibernateSnapshotGenerato
                     UniqueConstraint uniqueConstraint = new UniqueConstraint();
                     uniqueConstraint.setRelation(table);
                     uniqueConstraint.setClustered(false); // No way to set true via Hibernate
-                    String name = "UC_" + table.getName().toUpperCase() + column.getName().toUpperCase() + "_COL";
-                    if (name.length() > 64) {
-                        name = name.substring(0, 63);
-                    }
+                    // PATCH: Uses Hibernate's name generation
+                    uniqueConstraint.setName(Constraint.generateName("UK_", hibernateTable, column));
                     uniqueConstraint.addColumn(0, new Column(column.getName()).setRelation(table));
-                    uniqueConstraint.setName(name);
                     Scope.getCurrentScope().getLog(getClass()).info("Found unique constraint " + uniqueConstraint.toString());
                     table.getUniqueConstraints().add(uniqueConstraint);
 
