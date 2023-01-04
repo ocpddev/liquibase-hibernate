@@ -72,7 +72,6 @@
         <hibernate.version>5.6.10.Final</hibernate.version>
         <spring.version>5.3.22</spring.version>
         <liquibase.version>0-SNAPSHOT</liquibase.version>
-        <liquibase.sdk.github.token>${env.GITHUB_TOKEN}</liquibase.sdk.github.token>
 
         <sonar.organization>liquibase</sonar.organization>
         <sonar.projectKey>${project.artifactId}</sonar.projectKey>
@@ -146,7 +145,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.liquibase</groupId>
+            <groupId>phyworks.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <version>${liquibase.version}</version>
         </dependency>
